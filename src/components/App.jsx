@@ -5,7 +5,6 @@ import { fetchImages } from '../services/Api';
 import { Button } from './Button';
 import { Circles } from 'react-loader-spinner';
 import { Modal } from './Modal';
-// axios.defaults.headers.common['Authorization'] = API_KEY;
 
 export class App extends Component {
   state = {

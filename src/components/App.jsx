@@ -18,6 +18,8 @@ export const App = () => {
   const [showButton, setShowButton] = useState(false);
   const [largeImageURL, setLargeImageURL] = useState('');
 
+  // setPer_page(5);
+
   const getIMG = async () => {
     setIsLoading(true);
     try {
@@ -40,11 +42,9 @@ export const App = () => {
   };
 
   useEffect(() => {
-    if (firstRend) {
-      firstRend.current = false;
+    if (!searchWord) {
       return;
     }
-    console.log(firstRend);
     getIMG();
   }, [searchWord, page]);
 
@@ -60,7 +60,7 @@ export const App = () => {
     }
   };
 
-  const onPageUpload = async () => {
+  const onPageUpload = () => {
     setPage(prev => prev + 1);
   };
 

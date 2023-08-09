@@ -21,12 +21,13 @@ export const App = () => {
   const getIMG = async () => {
     setIsLoading(true);
     try {
+      console.log('ura');
       setShowButton(false);
       const res = await fetchImages({ q: searchWord, per_page, page });
       setHits(page === 1 ? res.hits : [...hits, ...res.hits]);
       setTotal(res.total);
       setTotalHits(res.totalHits);
-      setPage();
+      // setPage();
       setShowButton(
         page >= res.totalHits / per_page || res.total === 0 ? false : true
       );
@@ -43,7 +44,7 @@ export const App = () => {
       firstRend.current = false;
       return;
     }
-
+    console.log(firstRend);
     getIMG();
   }, [searchWord, page]);
 
@@ -74,7 +75,8 @@ export const App = () => {
           Open Window
         </button> */}
       {largeImageURL && (
-        <Modal onClose={toggleModal}>
+        // <Modal onClose={toggleModal}>
+        <Modal onClose={() => toggleModal('')}>
           <img className="modal" src={largeImageURL} alt="la-la-la" />
         </Modal>
       )}

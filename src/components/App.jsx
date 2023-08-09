@@ -1,120 +1,105 @@
 import { ImageGallery } from './ImageGallery';
 import { Searchbar } from './Searchbar';
-import React, { Component } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { fetchImages } from '../services/Api';
 import { Button } from './Button';
 import { Circles } from 'react-loader-spinner';
 import { Modal } from './Modal';
 
-export class App extends Component {
-  state = {
-    searchWord: 'world',
-    hits: [],
-    total: '',
-    totalHits: '',
-    per_page: 12,
-    page: 1,
-    isLoading: false,
-    showButton: false,
-    // showModal: false,
-    largeImageURL: '',
+export const App = () => {
+  const firstRend = useRef(true);
+  const [searchWord, setSearchWord] = useState('');
+  const [hits, setHits] = useState([]);
+  const [total, setTotal] = useState('');
+  const [totalHits, setTotalHits] = useState('');
+  const [per_page, setPer_page] = useState(12);
+  const [page, setPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showButton, setShowButton] = useState(false);
+  const [largeImageURL, setLargeImageURL] = useState('');
+
+  const getIMG = async () => {
+    setIsLoading(true);
+    try {
+      setShowButton(false);
+      const res = await fetchImages({ q: searchWord, per_page, page });
+      setHits(page === 1 ? res.hits : [...hits, ...res.hits]);
+      setTotal(res.total);
+      setTotalHits(res.totalHits);
+      setPage();
+      setShowButton(
+        page >= res.totalHits / per_page || res.total === 0 ? false : true
+      );
+      // });
+    } catch {
+      console.log('catch');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  componentDidMount() {}
-
-  async componentDidUpdate(prevProps, prevState) {
-    if (
-      prevState.searchWord !== this.state.searchWord ||
-      this.state.page !== prevState.page
-    ) {
-      const { searchWord: q, per_page, page } = this.state;
-      this.setState({ isLoading: true });
-      try {
-        this.setState({ showButton: false });
-        const res = await fetchImages({ q, per_page, page });
-        console.log(res.hits);
-        this.setState({
-          hits:
-            this.state.page === 1 ? res.hits : [...prevState.hits, ...res.hits],
-          total: res.total,
-          totalHits: res.totalHits,
-          page,
-          showButton:
-            page >= res.totalHits / per_page || res.total === 0 ? false : true,
-        });
-        console.log(res.total);
-        console.log(this.state.per_page);
-      } catch {
-        console.log('catch');
-      } finally {
-        this.setState({ isLoading: false });
-      }
+  useEffect(() => {
+    if (firstRend) {
+      firstRend.current = false;
+      return;
     }
-  }
 
-  handleSearchInput = word => {
+    getIMG();
+  }, [searchWord, page]);
+
+  const handleSearchInput = word => {
     if (!word) {
       alert('Enter something!');
       return;
     }
-    if (word !== this.state.searchWord) {
-      this.setState({ searchWord: word, page: 1 });
+    if (word !== searchWord) {
+      console.log(word);
+      setSearchWord(word);
+      setPage(1);
     }
   };
 
-  onPageUpload = async () => {
-    this.setState(prev => ({
-      page: prev.page + 1,
-    }));
-    // const { searchWord: q, per_page, page } = this.state;
+  const onPageUpload = async () => {
+    setPage(prev => prev + 1);
   };
 
-  toggleModal = largeImageURL => {
-    // this.setState(({ showModal }) => ({ showModal: !showModal }));
-    this.setState({ largeImageURL: largeImageURL ? largeImageURL : '' });
-    // this.setState({ largeImageURL });
+  const toggleModal = largeImageURL => {
+    setLargeImageURL(largeImageURL ? largeImageURL : '');
   };
 
-  render() {
-    const { isLoading, hits, totalHits, total, largeImageURL } = this.state;
-    return (
-      <div className="app">
-        <Searchbar onSubmit={this.handleSearchInput} />
-        {/* <button type="button" onClick={this.toggleModal}>
+  return (
+    <div className="app">
+      <Searchbar onSubmit={handleSearchInput} />
+      {/* <button type="button" onClick={toggleModal}>
           Open Window
         </button> */}
-        {largeImageURL && (
-          <Modal onClose={this.toggleModal}>
-            <img
-              className="modal"
-              src={this.state.largeImageURL}
-              alt="la-la-la"
-            />
-          </Modal>
-        )}
+      {largeImageURL && (
+        <Modal onClose={toggleModal}>
+          <img className="modal" src={largeImageURL} alt="la-la-la" />
+        </Modal>
+      )}
 
-        {isLoading && (
-          <div className="loader">
-            <Circles
-              height="80"
-              width="80"
-              color="#05da1e"
-              ariaLabel="circles-loading"
-              wrapperStyle={{}}
-              wrapperClass=""
-              visible={true}
-            />
-          </div>
-        )}
-        <ImageGallery
-          onModal={this.toggleModal}
-          total={total}
-          hits={hits}
-          totalHits={totalHits}
-        />
+      {isLoading && (
+        <div className="loader">
+          <Circles
+            height="80"
+            width="80"
+            color="#05da1e"
+            ariaLabel="circles-loading"
+            wrapperStyle={{}}
+            wrapperClass=""
+            visible={true}
+          />
+        </div>
+      )}
+      <ImageGallery
+        onModal={toggleModal}
+        total={total}
+        hits={hits}
+        totalHits={totalHits}
+      />
 
-        {this.state.showButton && <Button onPageUpload={this.onPageUpload} />}
-      </div>
-    );
-  }
-}
+      {showButton && <Button onPageUpload={onPageUpload} />}
+    </div>
+  );
+};

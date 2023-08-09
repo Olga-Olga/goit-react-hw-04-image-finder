@@ -6,7 +6,7 @@ export const ImageGallery = ({ hits, onModal }) => {
   return (
     <div>
       <ul className="imageGallery">
-        {hits.map(pic => (
+        {hits.map((pic, index) => (
           <ImageGalleryItem
             onModal={onModal}
             key={pic.id}

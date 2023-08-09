@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 
 const modalRoot = document.querySelector('#modal-root');
-export const Modal = ({ onClose }) => {
+export const Modal = ({ onClose, children }) => {
   const handleEscape = e => {
     if (e.code === 'Escape') {
       onClose();

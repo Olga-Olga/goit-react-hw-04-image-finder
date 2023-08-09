@@ -16,5 +16,5 @@ export const ImageGalleryItem = ({ largeImageURL, webformatURL, onModal }) => {
 ImageGalleryItem.propTypes = {
   webformatURL: PropTypes.string.isRequired,
   largeImageURL: PropTypes.string.isRequired,
-  onShonModal: PropTypes.func.isRequired,
+  onModal: PropTypes.func.isRequired,
 };
